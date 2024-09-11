@@ -114,6 +114,7 @@ async function compressImageFromURL(imageUrl, outputFilePath, quality=10 ) {
         url: imageUrl,
         method: 'GET',
         responseType: 'arraybuffer', // Get the image data as a buffer
+        timeout: 10000 // Timeout after 10 seconds
       });
       
       const imageBuffer = Buffer.from(response.data, 'binary'); // Create a buffer from the downloaded data
