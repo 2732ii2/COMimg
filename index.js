@@ -32,26 +32,43 @@ app.post('/sendfile',async(req,res)=>{
         const id=await genUniId({
             length:10
         })
+        // async function processRowsData(rowsData, id) {
+        //     // Iterate over each row of data
+        //     console.log("processRowDatabegin");
+        //     for (const e of rowsData) {
+        //       const outputFilePath = './images';
+        //       const arr = e[2].split(","); // Assuming e[2] contains comma-separated image URLs
+          
+        //       // Iterate over each URL in the array
+        //       for (let i = 0; i < arr.length; i++) {
+        //         console.log(arr[i], i);
+          
+        //         // Extract the image name from the URL
+        //         const name = arr[i].split("/").pop();
+        //         console.log(name);
+          
+        //         // Compress and save the image, waiting for each compression to complete
+        //         await compressImageFromURL(arr[i], `${outputFilePath}/_${id}_${i}_${name.split(".")[0]}.jpg`, 10);
+        //       }
+        //     }
+        //   }
         async function processRowsData(rowsData, id) {
-            // Iterate over each row of data
-            console.log("processRowDatabegin");
-            for (const e of rowsData) {
-              const outputFilePath = './images';
-              const arr = e[2].split(","); // Assuming e[2] contains comma-separated image URLs
-          
-              // Iterate over each URL in the array
-              for (let i = 0; i < arr.length; i++) {
-                console.log(arr[i], i);
-          
-                // Extract the image name from the URL
-                const name = arr[i].split("/").pop();
-                console.log(name);
-          
-                // Compress and save the image, waiting for each compression to complete
-                await compressImageFromURL(arr[i], `${outputFilePath}/_${id}_${i}_${name.split(".")[0]}.jpg`, 10);
-              }
-            }
+          console.log("processRowDatabegin");
+          for (const e of rowsData) {
+            const outputFilePath = './images';
+            const arr = e[2].split(","); // Assuming e[2] contains comma-separated image URLs
+        
+            const downloadPromises = arr.map((url, i) => {
+              const name = url.split("/").pop();
+              console.log(name);
+              return compressImageFromURL(url, `${outputFilePath}/_${id}_${i}_${name.split(".")[0]}.jpg`, 10);
+            });
+            
+            // Wait for all images in the row to be processed
+            await Promise.all(downloadPromises);
           }
+        }
+        
         await processRowsData(rowsData,id);
         console.log("addedDatatoDB");
         const resp =new mainmodel({header,rowsData,id});
