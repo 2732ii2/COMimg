@@ -34,6 +34,7 @@ app.post('/sendfile',async(req,res)=>{
         })
         async function processRowsData(rowsData, id) {
             // Iterate over each row of data
+            console.log("processRowDatabegin");
             for (const e of rowsData) {
               const outputFilePath = './images';
               const arr = e[2].split(","); // Assuming e[2] contains comma-separated image URLs
@@ -52,8 +53,11 @@ app.post('/sendfile',async(req,res)=>{
             }
           }
         await processRowsData(rowsData,id);
+        console.log("addedDatatoDB");
         const resp =new mainmodel({header,rowsData,id});
         resp.save();
+        console.log("DbSubmissionfinised");
+
        await mainCall(id);
        fs.rm('./images', { recursive: true, force: true }, (err) => {
         if (err) {

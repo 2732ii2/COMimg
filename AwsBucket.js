@@ -22,6 +22,7 @@ const s3=new S3Client({
 const folderPath = './images'; 
 
 const uploadToS3 = async (fileName, filePath,folderid) => {
+  console.log("uploadtoS3 function begins");
     const fileStream = fs.createReadStream(filePath);
   
     const uploadParams = {
@@ -42,6 +43,7 @@ const uploadToS3 = async (fileName, filePath,folderid) => {
   
 
 async function mainCall(folderid){
+  console.log("mainCall");
    
     fs.readdir('./images/', (err, files) => {
       if (err) {
