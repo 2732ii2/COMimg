@@ -124,28 +124,52 @@ res.json({msg:"we get the id",data:resp4[0]})
     }
 })
 
-async function compressImageFromURL(imageUrl, outputFilePath, quality=10 ) {
-    try {
-      // Step 1: Download the image from the URL using axios
-      const response = await axios({
-        url: imageUrl,
-        method: 'GET',
-        responseType: 'arraybuffer', // Get the image data as a buffer
-        timeout: 10000 // Timeout after 10 seconds
-      });
-      
-      const imageBuffer = Buffer.from(response.data, 'binary'); // Create a buffer from the downloaded data
-  
-      // Step 2: Use sharp to compress the image
-      await sharp(imageBuffer)
-        .jpeg({ quality: quality })  // Compress image to JPEG with the specified quality (80 by default)
-        .toFile(outputFilePath);     // Save the compressed image to a file
-  
-      console.log('Image compressed and saved to:', outputFilePath);
-    } catch (error) {
-      console.error('Error during image compression:', error);
-    }
+async function compressImageFromURL(imageUrl, outputFilePath, quality = 10) {
+  try {
+    console.log('Downloading and compressing image from:', imageUrl);
+    
+    // Create a writable stream
+    const writer = fs.createWriteStream(outputFilePath);
+    
+    // Stream the image data directly to the disk
+    const response = await axios({
+      url: imageUrl,
+      method: 'GET',
+      responseType: 'stream', // Stream the image data
+    });
+
+    // Pipe the stream to sharp for compression
+    response.data
+      .pipe(sharp().jpeg({ quality }))
+      .pipe(writer);
+    
+    console.log('Image compressed and saved to:', outputFilePath);
+  } catch (error) {
+    console.error('Error during image compression:', error);
   }
+}
+// async function compressImageFromURL(imageUrl, outputFilePath, quality=10 ) {
+//     try {
+//       // Step 1: Download the image from the URL using axios
+//       const response = await axios({
+//         url: imageUrl,
+//         method: 'GET',
+//         responseType: 'arraybuffer', // Get the image data as a buffer
+//         timeout: 10000 // Timeout after 10 seconds
+//       });
+      
+//       const imageBuffer = Buffer.from(response.data, 'binary'); // Create a buffer from the downloaded data
+  
+//       // Step 2: Use sharp to compress the image
+//       await sharp(imageBuffer)
+//         .jpeg({ quality: quality })  // Compress image to JPEG with the specified quality (80 by default)
+//         .toFile(outputFilePath);     // Save the compressed image to a file
+  
+//       console.log('Image compressed and saved to:', outputFilePath);
+//     } catch (error) {
+//       console.error('Error during image compression:', error);
+//     }
+//   }
   
 
 
